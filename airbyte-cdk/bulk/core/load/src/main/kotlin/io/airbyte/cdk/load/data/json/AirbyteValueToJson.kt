@@ -2,10 +2,11 @@
  * Copyright (c) 2024 Airbyte, Inc., all rights reserved.
  */
 
-package io.airbyte.cdk.load.data
+package io.airbyte.cdk.load.data.json
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import io.airbyte.cdk.load.data.*
 
 class AirbyteValueToJson {
     fun convert(value: AirbyteValue): JsonNode {
@@ -26,6 +27,7 @@ class AirbyteValueToJson {
             is TimeValue -> JsonNodeFactory.instance.textNode(value.value)
             is TimestampValue -> JsonNodeFactory.instance.textNode(value.value)
             is UnknownValue -> throw IllegalArgumentException("Unknown value: $value")
+            else -> throw IllegalArgumentException("Unsupported type ${value::class}")
         }
     }
 }

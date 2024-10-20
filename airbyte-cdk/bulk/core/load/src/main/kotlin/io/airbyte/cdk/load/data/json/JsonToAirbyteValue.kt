@@ -2,9 +2,10 @@
  * Copyright (c) 2024 Airbyte, Inc., all rights reserved.
  */
 
-package io.airbyte.cdk.load.data
+package io.airbyte.cdk.load.data.json
 
 import com.fasterxml.jackson.databind.JsonNode
+import io.airbyte.cdk.load.data.*
 import java.math.BigDecimal
 
 /**
@@ -37,6 +38,7 @@ class JsonToAirbyteValue {
                 is TimestampTypeWithoutTimezone -> TimestampValue(json.asText())
                 is UnionType -> toUnion(json, schema.options)
                 is UnknownType -> UnknownValue("From $schema: $json")
+                else -> throw IllegalArgumentException("Unsupported schema type: $schema")
             }
         } catch (t: Throwable) {
             return UnknownValue(t.message ?: "Unknown error")
@@ -180,6 +182,9 @@ class JsonToAirbyteValue {
             is TimestampTypeWithoutTimezone -> json.isTextual
             is UnionType -> schema.options.any { matchesStrictly(it, json) }
             is UnknownType -> false
+            is DateTypeIntegral,
+            is TimeTypeIntegral,
+            is TimestampTypeIntegral -> false
         }
     }
 
